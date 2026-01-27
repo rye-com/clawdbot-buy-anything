@@ -71,9 +71,14 @@ curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
     "paymentMethod": {
       "type": "STRIPE_TOKEN",
       "token": "tok_xxx"
+    },
+    "constraints": {
+      "maxTotalPrice": 50000
     }
   }'
 ```
+
+**`constraints.maxTotalPrice`**: The user's spending limit in cents (e.g. $500 = 50000). The API will reject the order if the total exceeds this. If the user said "no limit", omit the `constraints` field entirely.
 
 ## Pricing & Shipping
 
