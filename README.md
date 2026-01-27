@@ -7,7 +7,16 @@ A Clawdbot skill for purchasing products from Amazon. Like having Alexa in your 
 ### Via ClawdHub (recommended)
 
 ```bash
-npx clawdhub@latest install buy-anything
+# If you have clawdhub installed
+clawdhub install buy-anything
+
+# Or use npx
+npx clawdhub install buy-anything
+```
+
+Don't have clawdhub? Install it:
+```bash
+npm install -g clawdhub
 ```
 
 ### Manual
@@ -20,15 +29,6 @@ cp -r . ~/.clawdbot/skills/buy-anything
 
 # Or workspace installation
 cp -r . ./skills/buy-anything
-```
-
-## Setup
-
-1. Get a Rye API key at https://rye.com
-2. Set the environment variable:
-
-```bash
-export RYE_API_KEY="your-api-key"
 ```
 
 ## Usage

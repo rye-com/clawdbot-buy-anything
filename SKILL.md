@@ -1,17 +1,11 @@
 ---
 name: buy-anything
-description: Buy anything from Amazon. Just send a product link and I'll handle the rest.
+description: Purchase products from Amazon through conversational checkout. Use when user shares an Amazon product URL or says "buy", "order", or "purchase" with an Amazon link.
 ---
 
 # Buy Anything
 
-Purchase products from Amazon through conversational checkout. Like having Alexa in your chat app.
-
-## When to Use
-
-- User wants to buy something from Amazon
-- User shares an Amazon product URL
-- User says "buy", "order", or "purchase" with an Amazon link
+Like having Alexa in your chat app.
 
 ## Setup (Optional)
 
@@ -23,7 +17,7 @@ Add to your `~/.clawdbot/clawdbot.json`:
     "entries": {
       "buy-anything": {
         "config": {
-          "maxPurchasePrice": 500
+          "maxPurchasePrice": 50000
         }
       }
     }
@@ -33,7 +27,7 @@ Add to your `~/.clawdbot/clawdbot.json`:
 
 | Config | Description | Default |
 |--------|-------------|---------|
-| `maxPurchasePrice` | Maximum allowed purchase price in USD | No limit |
+| `maxPurchasePrice` | Maximum allowed purchase price in US cents (e.g. $500 = 50000) | No limit |
 
 ## Pricing
 
@@ -43,15 +37,14 @@ A 4% service fee is applied to all orders to cover payment processing.
 
 1. User provides Amazon product URL
 2. Collect shipping address (or use saved address if available)
-3. **Check price against maxPurchasePrice** - reject if over limit
-4. Use saved card if available, otherwise ask user for card details
-5. Tokenize card with Stripe
-6. Submit order to Rye API
-7. **Save card details to memory** for future purchases (ask user permission first)
+3. Use saved card if available, otherwise ask user for card details
+4. Tokenize card with Stripe
+5. Submit order to Rye API (pass maxPurchasePrice as constraint if configured)
+6. **Save card details to memory** for future purchases (ask user permission first)
 
 ## Tokenize Card with Stripe
 
-Before submitting an order, tokenize the card with Stripe. Use this publishable key: `pk_live_xxx`
+Before submitting an order, tokenize the card with Stripe. Use this publishable key: `pk_live_51LgDhrHGDlstla3fOYU3AUV6QpuOgVEUa1E1VxFnejJ7mWB4vwU7gzSulOsWQ3Q90VVSk1WWBzYBo0RBKY3qxIjV00LHualegh`
 
 ```
 POST https://api.stripe.com/v1/tokens
@@ -72,6 +65,7 @@ Content-Type: application/json
 {
   "productUrl": "https://amazon.com/dp/B0xxx",
   "quantity": 1,
+  "maxPurchasePrice": 50000,
   "buyer": {
     "firstName": "John",
     "lastName": "Doe",
@@ -89,6 +83,8 @@ Content-Type: application/json
   }
 }
 ```
+
+Pass `maxPurchasePrice` from user config. API will reject if product price exceeds limit.
 
 ## Memory
 
@@ -140,15 +136,17 @@ Clawdbot: Order placed!
 
 ### Over Limit Example
 
+If the API rejects due to maxPurchasePrice constraint:
+
 ```
 User: Buy this https://amazon.com/dp/B0xxx (price: $750)
 
-Clawdbot: This item costs $750, which exceeds your max purchase limit of $500.
+Clawdbot: This item costs $750.00, which exceeds your max purchase limit of $500.00.
           Would you like to update your limit or choose a different item?
 ```
 
 ## Supported Marketplaces
 
-- Amazon (amazon.com, amazon.co.uk, etc.)
+- Amazon (amazon.com only)
 
 More marketplaces coming soon.
