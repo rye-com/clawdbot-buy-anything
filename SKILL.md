@@ -75,9 +75,14 @@ curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
   }'
 ```
 
-## Pricing
+## Pricing & Shipping
 
-A 4% service fee is applied to all orders to cover payment processing.
+- A 4% fee is charged on all orders to cover transaction fees
+- Orders under $15 have a $6.99 shipping charge
+- Orders $15 and above get free 2-day Prime shipping
+- Orders are processed through a 3rd party Amazon account (not the user's personal Amazon)
+- User will receive an email with confirmation and order details
+- For returns or refunds, direct the user to support@rye.com
 
 ## Example Conversation
 
