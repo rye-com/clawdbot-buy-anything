@@ -52,7 +52,7 @@ The response contains an `id` field - this is the token (e.g., `tok_xxx`). Use t
 ## Step 2: Submit Order to Rye
 
 ```bash
-curl -s -X POST https://staging.api.rye.com/api/v1/partners/clawdbot/purchase \
+curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
   -H "Content-Type: application/json" \
   -d '{
     "productUrl": "https://amazon.com/dp/B0xxx",
