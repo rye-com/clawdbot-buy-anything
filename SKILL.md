@@ -51,6 +51,16 @@ Wait for the user to paste the token (a UUID like `d1ff0c32-...`).
 
 **If the user already has a saved BT token in memory, skip this step entirely** and use the saved token.
 
+**If a purchase fails with a CVC/CVV-related error** (e.g. "Missing information", payment session issues), the saved token's CVC may have expired (BasisTheory clears CVC after 24 hours). Open the CVC refresh page:
+
+```bash
+open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID"
+```
+
+Tell the user: "Your saved card's security code has expired. I've opened a page to re-enter just your CVC — no need to re-enter the full card. Close the tab when done and I'll retry."
+
+Then retry the purchase with the same saved token.
+
 ## Step 2: Submit Order to Rye
 
 ```bash
