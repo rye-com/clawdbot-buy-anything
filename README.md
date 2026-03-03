@@ -129,7 +129,7 @@ Every order sends an email confirmation to the address you provide, so you alway
 
 ## Pricing & Shipping
 
-- **Shopify stores**: No additional fees
+- **Shopify stores**: Standard store pricing — no markup from us
 - **Amazon**: 4% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping
