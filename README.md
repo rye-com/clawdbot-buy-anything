@@ -1,6 +1,6 @@
 # buy-anything
 
-A Clawdbot skill for purchasing products from Amazon. Like having Alexa in your chat app.
+A Clawdbot skill for purchasing products from Amazon and Shopify stores. Like having a personal shopper in your chat app.
 
 ## Installation
 
@@ -33,7 +33,7 @@ cp -r . ./skills/buy-anything
 
 ## Usage
 
-Just ask Clawdbot to buy something from Amazon:
+Just ask Clawdbot to buy something from Amazon or any Shopify store:
 
 ```
 You: Buy this for me https://amazon.com/dp/B0DJLKV4N9
@@ -46,69 +46,75 @@ Clawdbot: Got it! What's your max purchase price? (I'll warn you before exceedin
 
 You: $500
 
-Clawdbot: Now I need your card details.
-          Your card will be securely tokenized through Stripe.
+Clawdbot: I'm opening a secure card entry page in your browser.
+          Enter your card details there — they never touch this chat.
+          After submitting, copy the token and paste it here.
+          [Opens browser to card capture page]
 
-You: 4242424242424242, 12/27, 123
+You: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
 Clawdbot: Order placed!
-          Total: $361.92 (includes 4% fee)
+          Total: $361.92 (includes 4% Amazon fee)
           Confirmation: RYE-ABC123
 
-          Want me to save your details for next time?
+          Want me to save your card token for next time?
 ```
 
 After saving, future purchases are one message:
 
 ```
-You: Buy this https://amazon.com/dp/B0CXXX
+You: Buy this https://cool-store.com/products/gadget
 
-Clawdbot: Order placed! Total: $29.99 + $1.20 fee = $31.19
+Clawdbot: Order placed! Total: $29.99 (0% Shopify fee)
 ```
 
 ## How Payments Work
 
 ### The short version
 
-Your card number goes directly to Stripe (the same payment processor used by Amazon, Shopify, and most of the internet). Stripe turns it into a one-time token. That token — not your card number — is what gets sent to place the order. The Buy Anything skill and the Rye API never see your raw card details.
+When you make your first purchase, Clawdbot opens a secure card entry page in your browser. Your card details go directly to [BasisTheory](https://basistheory.com/) — a PCI-certified token vault — and are converted into a reusable token. Your card number never appears in chat, never touches Clawdbot, and never reaches Rye's servers. Only the token ID is used for purchases.
 
 ### Under the hood
 
 ```
-You type card info
-        │
-        ▼
-┌──────────────┐
-│   Stripe     │ ← Card goes here (PCI-certified processor)
-│   Tokenize   │
-└──────┬───────┘
-       │ tok_xxx (one-time token)
-       ▼
-┌──────────────┐
-│   Rye API    │ ← Only sees the token, never your card
-│   Purchase   │
-└──────┬───────┘
-       │
-       ▼
-  Order placed on Amazon
+Clawdbot opens card capture page in your browser
+        |
+        v
+You enter card details
+(BasisTheory secure iframes — card goes directly to BT vault)
+        |
+        v
+BasisTheory returns token ID
+You copy it back into chat
+        |
+        v
++----------------+
+|   Rye API      | <-- Only sees the BT token ID, never your card
+|   Purchase     |
++--------+-------+
+         |
+         v
+Shopify: card forwarded directly to store (0% fee)
+Amazon: token converted to payment server-side (4% fee)
 ```
 
-1. **You provide your card** — number, expiry, CVC
-2. **Stripe tokenizes it** — your card details are sent directly to Stripe's PCI-compliant API via HTTPS. Stripe returns a one-time token (e.g. `tok_abc123`)
-3. **Token is used to pay** — the Rye API receives only the token to place the Amazon order. Your raw card number never touches Rye's servers
-4. **Stripe handles the charge** — Stripe processes the payment using the token, just like any online checkout
-
-This is the same tokenization flow used by every major e-commerce site. Your card number is never stored or transmitted outside of Stripe.
+1. **Clawdbot opens a secure page** — a hosted web page with BasisTheory's PCI-compliant card elements loads in your browser
+2. **You enter your card** — card details are captured in BasisTheory's secure iframes and sent directly to their vault. The card never appears in chat or in any Clawdbot process
+3. **BasisTheory returns a token** — a reusable token ID (e.g. `d1ff0c32-...`) that represents your card
+4. **You paste the token** — copy the token from the page and paste it into chat. This is an opaque ID, not your card number
+5. **Token is used to pay** — the Rye API receives only the token to place the order. For Shopify stores, the card is forwarded directly to the store's payment processor. For Amazon, it's converted server-side
 
 ### Saved cards
 
-When you save your card for future purchases, your details are stored **locally in Clawdbot's memory on your device**. They never leave your machine. Each time you make a purchase, Clawdbot re-tokenizes the saved card with Stripe to get a fresh one-time token.
+When you save your card for future purchases, only the **BasisTheory token ID** is stored in Clawdbot's memory on your device — not your card number, expiry, or CVC. The token can only be used through Rye's API and cannot be reverse-engineered back to your card details. Future purchases reuse this token directly with no card entry needed.
+
+To remove your saved card, ask Clawdbot to forget your card token. To also revoke the token from BasisTheory's vault, contact [support@rye.com](mailto:support@rye.com).
 
 ## Guardrails
 
 ### Spending limit
 
-On your first purchase, Clawdbot will ask you to set a maximum purchase price. If any order (including the 4% fee) would exceed your limit, Clawdbot will warn you and ask for confirmation before proceeding. You can say "no limit" to skip this.
+On your first purchase, Clawdbot will ask you to set a maximum purchase price. If any order (including fees) would exceed your limit, Clawdbot will warn you and ask for confirmation before proceeding. You can say "no limit" to skip this.
 
 You can update your limit at any time by telling Clawdbot:
 
@@ -123,13 +129,15 @@ Every order sends an email confirmation to the address you provide, so you alway
 
 ## Pricing & Shipping
 
-- A 4% fee is charged on all orders to cover transaction fees
-- Orders under $15 have a $6.99 shipping charge
-- Orders $15 and above get free 2-day Prime shipping
+- **Shopify stores**: 0% fee — your card is forwarded directly to the store
+- **Amazon**: 4% fee to cover transaction costs
+- Amazon orders under $15 have a $6.99 shipping charge
+- Amazon orders $15 and above get free 2-day Prime shipping
 
 ## Good to Know
 
-- Orders are processed through a third-party Amazon account — you can't connect orders to your personal Amazon account at this time
+- Shopify orders go through the store's normal checkout — the store handles fulfillment directly
+- Amazon orders are processed through a third-party Amazon account — you can't connect orders to your personal Amazon account at this time
 - You'll receive an email with order confirmation and details after each purchase
 - For returns or refunds, contact support@rye.com
 
