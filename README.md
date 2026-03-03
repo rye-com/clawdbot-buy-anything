@@ -65,7 +65,7 @@ After saving, future purchases are one message:
 ```
 You: Buy this https://cool-store.com/products/gadget
 
-Clawdbot: Order placed! Total: $29.99 (0% Shopify fee)
+Clawdbot: Order placed! Total: $29.99
 ```
 
 ## How Payments Work
@@ -94,7 +94,7 @@ You copy it back into chat
 +--------+-------+
          |
          v
-Shopify: card forwarded directly to store (0% fee)
+Shopify: card forwarded directly to store
 Amazon: token converted to payment server-side (4% fee)
 ```
 
@@ -129,7 +129,7 @@ Every order sends an email confirmation to the address you provide, so you alway
 
 ## Pricing & Shipping
 
-- **Shopify stores**: 0% fee — your card is forwarded directly to the store
+- **Shopify stores**: No additional fees
 - **Amazon**: 4% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping

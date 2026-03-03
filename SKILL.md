@@ -86,7 +86,7 @@ curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
 
 The API validates the store automatically. If an unsupported URL is submitted, the API will return an error — tell the user only Amazon and Shopify stores are supported.
 
-- **Shopify stores**: 0% fee — card is forwarded directly to the Shopify store's payment processor
+- **Shopify stores**: No additional fees
 - **Amazon**: 4% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping
