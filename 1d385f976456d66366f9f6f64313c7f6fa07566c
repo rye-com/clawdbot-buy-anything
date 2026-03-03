@@ -1,0 +1,25 @@
+SKILL.md
+  aa700d2cec38beaa 89
+README.md
+  aa700d2cec38beaa 132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "1d385f976456d66366f9f6f64313c7f6fa07566c",
+  "prompts": {
+    "aa700d2cec38beaa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12e24f9c-a5f8-4540-8c33-474e08b2191b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Victor Tsyan <victor@rye.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 2,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
