@@ -54,7 +54,7 @@ Clawdbot: I'm opening a secure card entry page in your browser.
 You: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
 Clawdbot: Order placed!
-          Total: $361.92 (includes 4% Amazon fee)
+          Total: $361.92 (includes 4% service fee)
           Confirmation: RYE-ABC123
 
           Want me to save your card token for next time?

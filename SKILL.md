@@ -120,7 +120,7 @@ You: Got it! Processing your order...
      [Uses bash to run Rye API curl command with the BT token]
 
 You: Order placed!
-     Total: $361.92 (includes 4% Amazon fee)
+     Total: $361.92 (includes 4% service fee)
      Confirmation: RYE-ABC123
 
      Would you like me to save your card token and address for faster checkout next time?
