@@ -1,0 +1,25 @@
+SKILL.md
+  aa700d2cec38beaa 3,9,15-17,21,24-25,27,33,35-36,38,40,42,45,48-52,60,74-75,87,89-93,102,112-115,117,119-120,123,126,132,138,141-142
+README.md
+  aa700d2cec38beaa 3,36,49-52,54,57,60,66,68,75,80-98,101-105,109,111,117,132-135,139-140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.7",
+  "base_commit_sha": "647edcb32b2d8f9bf19b89ca079271c63fea7e4f",
+  "prompts": {
+    "aa700d2cec38beaa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "12e24f9c-a5f8-4540-8c33-474e08b2191b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Victor Tsyan <victor@rye.com>",
+      "messages": [],
+      "total_additions": 239,
+      "total_deletions": 185,
+      "accepted_lines": 148,
+      "overriden_lines": 0
+    }
+  }
+}
