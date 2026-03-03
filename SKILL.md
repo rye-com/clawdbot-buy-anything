@@ -82,6 +82,31 @@ curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
 
 **`constraints.maxTotalPrice`**: The user's spending limit in cents (e.g. $500 = 50000). The API will reject the order if the total exceeds this. If the user said "no limit", omit the `constraints` field entirely.
 
+The POST response contains an `id` field (e.g. `ci_abc123`). Use this to poll for the order status.
+
+## Step 3: Poll for Order Status
+
+After submitting the order, use the `id` from the POST response to poll for the final result:
+
+```bash
+curl -s https://api.rye.com/api/v1/partners/clawdbot/purchase/CHECKOUT_INTENT_ID
+```
+
+Replace `CHECKOUT_INTENT_ID` with the actual ID (e.g. `ci_abc123`).
+
+Poll every 5 seconds until the state is a terminal state. The response `state` will be one of:
+- `retrieving_offer` — fetching product details and pricing (keep polling)
+- `placing_order` — order is being placed with the store (keep polling)
+- `completed` — order placed successfully (stop polling)
+- `failed` — order failed (stop polling)
+
+When `completed`, show the user:
+- Product name from `offer.product.title`
+- Total from `offer.cost.total` (format as dollars, value is in cents)
+- Order ID from `orderId` (if present)
+
+When `failed`, show `failureReason.message` to the user.
+
 ## Pricing & Shipping
 
 The API validates the store automatically. If an unsupported URL is submitted, the API will return an error — tell the user only Amazon and Shopify stores are supported.
@@ -116,12 +141,16 @@ You: Max set to $500. I'm opening a secure card entry page in your browser now.
 
 User: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
-You: Got it! Processing your order...
-     [Uses bash to run Rye API curl command with the BT token]
+You: Got it! Submitting your order...
+     [POST to purchase API with the BT token, gets back ci_abc123]
 
-You: Order placed!
+You: Order submitted! Waiting for confirmation...
+     [Polls GET /purchase/ci_abc123 every 5 seconds]
+
+You: Order confirmed!
+     Product: Wireless Earbuds Pro
      Total: $361.92 (includes 4% service fee)
-     Confirmation: RYE-ABC123
+     Order ID: RYE-ABC123
 
      Would you like me to save your card token and address for faster checkout next time?
 ```
