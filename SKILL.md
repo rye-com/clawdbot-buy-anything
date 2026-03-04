@@ -65,6 +65,8 @@ Then retry the purchase with the same saved token.
 
 ## Step 2: Submit Order to Rye
 
+The partner endpoint is authenticated by the partner path — no API key header is needed. Only requests to `/partners/clawdbot/` are accepted.
+
 ```bash
 curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
   -H "Content-Type: application/json" \
@@ -175,9 +177,12 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 
 ## Memory
 
+Saved data is stored in the agent's local memory on the user's device only — it is not synced to the cloud or shared across devices.
+
 After first successful purchase (with user permission):
 - Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
 - Save shipping address to memory
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
+- Always confirm with the user before placing an order with a saved token
 - If the user asks to remove their saved card, tell them to ask you to forget the token from memory. To also revoke the token from BasisTheory's vault, direct them to contact support@rye.com
