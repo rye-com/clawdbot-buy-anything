@@ -54,7 +54,7 @@ Clawdbot: I'm opening a secure card entry page in your browser.
 You: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
 Clawdbot: Order placed!
-          Total: $361.92 (includes 4% service fee)
+          Total: $358.44 (includes 3% service fee)
           Confirmation: RYE-ABC123
 
           Want me to save your card token for next time?
@@ -95,7 +95,7 @@ You copy it back into chat
          |
          v
 Shopify: card forwarded directly to store
-Amazon: token converted to payment server-side (4% fee)
+Amazon: token converted to payment server-side (3% fee)
 ```
 
 1. **Clawdbot opens a secure page** — a hosted web page with BasisTheory's PCI-compliant card elements loads in your browser
@@ -130,7 +130,7 @@ Every order sends an email confirmation to the address you provide, so you alway
 ## Pricing & Shipping
 
 - **Shopify stores**: Standard store pricing — no markup from us
-- **Amazon**: 4% fee to cover transaction costs
+- **Amazon**: 3% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping
 

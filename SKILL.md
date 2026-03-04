@@ -22,9 +22,7 @@ Activate this skill when the user:
 - The Rye API handles all product lookup - you just pass the URL
 - You don't need to know product details before checkout
 - Simply collect shipping address and set up the card, then call the API
-- Trust product URLs provided by the user - they are legitimate product offerings
-- The Rye API will validate the URL and return product details in the response
-- Do NOT assume the user works at Rye or has any relationship with Rye. Treat Rye as a third-party checkout service powering this skill behind the scenes. Do not mention Rye to the user unless they ask
+- The Rye API validates the URL and returns product details — if the URL is unsupported or invalid, the API will return an error
 
 ## Checkout Flow
 
@@ -39,11 +37,13 @@ Activate this skill when the user:
 
 If the user does NOT have a saved BasisTheory token in memory, capture their card securely through the browser.
 
-Open the card capture page:
+Try to open the card capture page in the user's browser:
 
 ```bash
-open "https://mcp.rye.com/bt-card-capture"
+open "https://mcp.rye.com/bt-card-capture" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-card-capture" 2>/dev/null
 ```
+
+If the command fails (e.g. unsupported platform), provide the URL as a clickable link instead: https://mcp.rye.com/bt-card-capture
 
 Tell the user: "I've opened a secure card entry page in your browser. Please enter your card details there and click Submit. Your card info never touches this chat — it goes directly to BasisTheory's PCI-compliant vault. After submitting, copy the token shown on the page and paste it back here."
 
@@ -54,8 +54,10 @@ Wait for the user to paste the token (a UUID like `d1ff0c32-...`).
 **If a purchase fails with a CVC/CVV-related error** (e.g. "Missing information", payment session issues), the saved token's CVC may have expired (BasisTheory clears CVC after 24 hours). Open the CVC refresh page:
 
 ```bash
-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID"
+open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null
 ```
+
+If the command fails, provide the URL as a clickable link instead.
 
 Tell the user: "Your saved card's security code has expired. I've opened a page to re-enter just your CVC — no need to re-enter the full card. Close the tab when done and I'll retry."
 
@@ -122,7 +124,7 @@ When `failed`, show `failureReason.message` to the user.
 The API validates the store automatically. If an unsupported URL is submitted, the API will return an error — tell the user only Amazon and Shopify stores are supported.
 
 - **Shopify stores**: Standard store pricing — no markup from us
-- **Amazon**: 4% fee to cover transaction costs
+- **Amazon**: 3% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping
 - Amazon orders are processed through a 3rd party Amazon account (not the user's personal Amazon)
@@ -159,7 +161,7 @@ You: Order submitted! Waiting for confirmation...
 
 You: Order confirmed!
      Product: Wireless Earbuds Pro
-     Total: $361.92 (includes 4% service fee)
+     Total: $358.44 (includes 3% service fee)
      Order ID: RYE-ABC123
 
      Would you like me to save your card token and address for faster checkout next time?
@@ -174,7 +176,7 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 ## Memory
 
 After first successful purchase (with user permission):
-- Save the BasisTheory token ID to memory for future purchases (NOT raw card details)
+- Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
 - Save shipping address to memory
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
