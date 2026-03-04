@@ -1,0 +1,23 @@
+SKILL.md
+  8071dd37467c410d 68-69,180-181,187
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "dae63590b63baa89973bc324d64bb5d0afa42607",
+  "prompts": {
+    "8071dd37467c410d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fb2955dd-e765-42ca-a6a8-ea7d612f8835",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Victor Tsyan <victor@rye.com>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 0,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
