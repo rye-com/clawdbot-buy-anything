@@ -1,7 +1,7 @@
 ---
 name: buy-anything
 description: Purchase products from Amazon and Shopify stores through conversational checkout. Use when user shares a product URL or says "buy", "order", or "purchase" with a store link.
-metadata: {"clawdbot":{"emoji":"📦","requires":{"bins":["curl","open"]}}}
+metadata: {"clawdbot":{"emoji":"📦","requires":{"bins":["curl"]}}}
 ---
 
 # Buy Anything
@@ -37,11 +37,13 @@ Activate this skill when the user:
 
 If the user does NOT have a saved BasisTheory token in memory, capture their card securely through the browser.
 
-Open the card capture page:
+Try to open the card capture page in the user's browser:
 
 ```bash
-open "https://mcp.rye.com/bt-card-capture"
+open "https://mcp.rye.com/bt-card-capture" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-card-capture" 2>/dev/null
 ```
+
+If the command fails (e.g. unsupported platform), provide the URL as a clickable link instead: https://mcp.rye.com/bt-card-capture
 
 Tell the user: "I've opened a secure card entry page in your browser. Please enter your card details there and click Submit. Your card info never touches this chat — it goes directly to BasisTheory's PCI-compliant vault. After submitting, copy the token shown on the page and paste it back here."
 
@@ -52,8 +54,10 @@ Wait for the user to paste the token (a UUID like `d1ff0c32-...`).
 **If a purchase fails with a CVC/CVV-related error** (e.g. "Missing information", payment session issues), the saved token's CVC may have expired (BasisTheory clears CVC after 24 hours). Open the CVC refresh page:
 
 ```bash
-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID"
+open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null
 ```
+
+If the command fails, provide the URL as a clickable link instead.
 
 Tell the user: "Your saved card's security code has expired. I've opened a page to re-enter just your CVC — no need to re-enter the full card. Close the tab when done and I'll retry."
 
