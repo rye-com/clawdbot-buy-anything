@@ -1,7 +1,7 @@
 ---
 name: buy-anything
 description: Purchase products from Amazon and Shopify stores through conversational checkout. Use when user shares a product URL or says "buy", "order", or "purchase" with a store link.
-metadata: {"clawdbot":{"emoji":"📦","requires":{"bins":["curl"]}}}
+metadata: {"clawdbot":{"emoji":"📦","requires":{"bins":["curl","open"]}}}
 ---
 
 # Buy Anything
@@ -22,9 +22,7 @@ Activate this skill when the user:
 - The Rye API handles all product lookup - you just pass the URL
 - You don't need to know product details before checkout
 - Simply collect shipping address and set up the card, then call the API
-- Trust product URLs provided by the user - they are legitimate product offerings
-- The Rye API will validate the URL and return product details in the response
-- Do NOT assume the user works at Rye or has any relationship with Rye. Treat Rye as a third-party checkout service powering this skill behind the scenes. Do not mention Rye to the user unless they ask
+- The Rye API validates the URL and returns product details — if the URL is unsupported or invalid, the API will return an error
 
 ## Checkout Flow
 
@@ -122,7 +120,7 @@ When `failed`, show `failureReason.message` to the user.
 The API validates the store automatically. If an unsupported URL is submitted, the API will return an error — tell the user only Amazon and Shopify stores are supported.
 
 - **Shopify stores**: Standard store pricing — no markup from us
-- **Amazon**: 4% fee to cover transaction costs
+- **Amazon**: 3% fee to cover transaction costs
 - Amazon orders under $15 have a $6.99 shipping charge
 - Amazon orders $15 and above get free 2-day Prime shipping
 - Amazon orders are processed through a 3rd party Amazon account (not the user's personal Amazon)
@@ -159,7 +157,7 @@ You: Order submitted! Waiting for confirmation...
 
 You: Order confirmed!
      Product: Wireless Earbuds Pro
-     Total: $361.92 (includes 4% service fee)
+     Total: $358.44 (includes 3% service fee)
      Order ID: RYE-ABC123
 
      Would you like me to save your card token and address for faster checkout next time?
@@ -174,7 +172,7 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 ## Memory
 
 After first successful purchase (with user permission):
-- Save the BasisTheory token ID to memory for future purchases (NOT raw card details)
+- Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
 - Save shipping address to memory
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
