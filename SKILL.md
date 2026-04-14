@@ -177,12 +177,17 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 
 ## Memory
 
-Saved data is stored in the agent's local memory on the user's device only — it is not synced to the cloud or shared across devices.
+Saved data is stored in Claude Code's local memory on the user's device only — it is never synced to the cloud, shared across devices, or accessible to other skills or agents.
 
-After first successful purchase (with user permission):
+After first successful purchase, **only with explicit user permission**:
 - Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
 - Save shipping address to memory
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
-- Always confirm with the user before placing an order with a saved token
-- If the user asks to remove their saved card, tell them to ask you to forget the token from memory. To also revoke the token from BasisTheory's vault, direct them to contact orders@rye.com
+- Always confirm with the user before placing an order with a saved token — never place a purchase autonomously
+
+### Token revocation
+
+- **Local deletion**: If the user asks to remove their saved card, delete the token from memory immediately. This prevents future purchases through this skill.
+- **Vault revocation**: To also revoke the token from BasisTheory's vault (so it cannot be used by any system), direct the user to contact [orders@rye.com](mailto:orders@rye.com)
+- Users can delete all saved data at any time by asking to forget their card, address, and spending limit
