@@ -131,7 +131,7 @@ The API validates the store automatically. If an unsupported URL is submitted, t
 - Amazon orders $15 and above get free 2-day Prime shipping
 - Amazon orders are processed through a 3rd party Amazon account (not the user's personal Amazon)
 - User will receive an email with confirmation and order details
-- For returns or refunds, direct the user to support@rye.com
+- For returns or refunds, direct the user to orders@rye.com
 
 ## Example Conversation
 
@@ -185,4 +185,4 @@ After first successful purchase (with user permission):
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
 - Always confirm with the user before placing an order with a saved token
-- If the user asks to remove their saved card, tell them to ask you to forget the token from memory. To also revoke the token from BasisTheory's vault, direct them to contact support@rye.com
+- If the user asks to remove their saved card, tell them to ask you to forget the token from memory. To also revoke the token from BasisTheory's vault, direct them to contact orders@rye.com
