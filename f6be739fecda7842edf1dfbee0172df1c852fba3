@@ -1,0 +1,25 @@
+SKILL.md
+  d9e563685412007a 134,188
+README.md
+  d9e563685412007a 111,142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "f6be739fecda7842edf1dfbee0172df1c852fba3",
+  "prompts": {
+    "d9e563685412007a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9e106bb-0217-4de2-9417-cb849bac209b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Victor Tsyan",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
