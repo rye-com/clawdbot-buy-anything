@@ -106,9 +106,12 @@ Amazon: token converted to payment server-side (3% fee)
 
 ### Saved cards
 
-When you save your card for future purchases, only the **BasisTheory token ID** is stored in Clawdbot's memory on your device — not your card number, expiry, or CVC. The token can only be used through Rye's API and cannot be reverse-engineered back to your card details. Future purchases reuse this token directly with no card entry needed.
+When you save your card for future purchases (opt-in only — Clawdbot will ask first), only the **BasisTheory token ID** is stored in Claude Code's local memory on your device — not your card number, expiry, or CVC. This data is never synced to the cloud, shared across devices, or accessible to other skills or agents. The token can only be used through Rye's API and cannot be reverse-engineered back to your card details. Future purchases reuse this token directly with no card entry needed. Clawdbot will always ask for confirmation before placing any order with a saved token.
 
-To remove your saved card, ask Clawdbot to forget your card token. To also revoke the token from BasisTheory's vault, contact [support@rye.com](mailto:support@rye.com).
+To remove your saved card:
+- **Ask Clawdbot to forget your card token** — this deletes it from local memory and prevents future purchases through this skill
+- **To also revoke the token from BasisTheory's vault** (so it can't be used by any system), contact [orders@rye.com](mailto:orders@rye.com)
+- You can delete all saved data (card, address, spending limit) at any time by asking Clawdbot to forget it
 
 ## Guardrails
 
@@ -139,7 +142,7 @@ Every order sends an email confirmation to the address you provide, so you alway
 - Shopify orders go through the store's normal checkout — the store handles fulfillment directly
 - Amazon orders are processed through a third-party Amazon account — you can't connect orders to your personal Amazon account at this time
 - You'll receive an email with order confirmation and details after each purchase
-- For returns or refunds, contact support@rye.com
+- For returns or refunds, contact orders@rye.com
 
 ## Legal
 
