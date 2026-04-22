@@ -1,0 +1,23 @@
+SKILL.md
+  3b4de8e2228c73d3 26-28,59,75,77-80,103,112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "2a422cdce68d06df9e0172a7e8621a95a89f4316",
+  "prompts": {
+    "3b4de8e2228c73d3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "78dff54f-321e-4857-829a-e92c5110278c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Victor Tsyan",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 42,
+      "accepted_lines": 11,
+      "overriden_lines": 0
+    }
+  }
+}
