@@ -32,39 +32,27 @@ Activate this skill when the user:
 1. **User provides product URL** - confirm you'll help them buy it
 2. **Collect shipping address** (or use saved address from memory)
 3. **Set up card via BasisTheory** (or use saved BT token from memory)
-4. **Submit order to Rye API using bash** (see Step 2)
+4. **Submit order to Rye API** (see Step 2)
 5. **Show order confirmation** from API response
 6. **Save BT token/address to memory** for future purchases (ask permission first)
 
 ## Step 1: Secure Card Capture via BasisTheory
 
-If the user does NOT have a saved BasisTheory token in memory, capture their card securely through the browser.
+If the user does NOT have a saved BasisTheory token in memory, have them open the secure card capture page in their own browser.
 
-Try to open the card capture page in the user's browser:
+Send the user this link: `https://mcp.rye.com/bt-card-capture`
 
-```bash
-open "https://mcp.rye.com/bt-card-capture" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-card-capture" 2>/dev/null
-```
-
-If the command fails (e.g. unsupported platform), provide the URL as a clickable link instead: https://mcp.rye.com/bt-card-capture
-
-Tell the user: "I've opened a secure card entry page in your browser. Please enter your card details there and click Submit. Your card info never touches this chat — it goes directly to BasisTheory's PCI-compliant vault. After submitting, copy the token shown on the page and paste it back here."
+Tell the user: "Open the secure card entry page above. Enter your card details there and click Submit. Your card info never touches this chat — it goes directly to BasisTheory's PCI-compliant vault. After submitting, copy the token shown on the page and paste it back here."
 
 Wait for the user to paste the token (a UUID like `d1ff0c32-...`).
 
 **If the user already has a saved BT token in memory, skip this step entirely** and use the saved token.
 
-**If a purchase fails with a CVC/CVV-related error** (e.g. "Missing information", payment session issues), the saved token's CVC may have expired (BasisTheory clears CVC after 24 hours). Open the CVC refresh page:
+**If a purchase fails with a CVC/CVV-related error** (e.g. "Missing information", payment session issues), the saved token's CVC may have expired (BasisTheory clears CVC after 24 hours). Send the user the CVC refresh link with the saved token ID substituted:
 
-Before running, check that `SAVED_TOKEN_ID` matches `^[0-9a-fA-F-]{36}$`. Refuse to open the URL otherwise.
+`https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID`
 
-```bash
-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null
-```
-
-If the command fails, provide the URL as a clickable link instead.
-
-Tell the user: "Your saved card's security code has expired. I've opened a page to re-enter just your CVC — no need to re-enter the full card. Close the tab when done and I'll retry."
+Tell the user: "Your saved card's security code has expired. Open the link above, re-enter just your CVC, and let me know when it's done — I won't retry until you confirm."
 
 Then retry the purchase with the same saved token.
 
@@ -157,10 +145,10 @@ You: Got it! What's your maximum purchase price? (I'll warn you if an order exce
 
 User: $500
 
-You: Max set to $500. I'm opening a secure card entry page in your browser now.
-     Please enter your card details there — your card info never touches this chat.
+You: Max set to $500. Open this secure card entry page in your browser:
+     https://mcp.rye.com/bt-card-capture
+     Enter your card details there — your card info never touches this chat.
      After submitting, copy the token shown on the page and paste it here.
-     [Opens https://mcp.rye.com/bt-card-capture]
 
 User: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
@@ -186,7 +174,9 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 
 ## Memory
 
-Saved data is stored in Claude Code's local memory on the user's device only — it is never synced to the cloud, shared across devices, or accessible to other skills or agents.
+Saving is opt-in per user request. The skill asks the host platform to persist data to its agent memory; where that memory lives (local disk, sync, access by other agents, log retention) is the host's responsibility, not the skill's. This skill does not and cannot guarantee storage location.
+
+If the user is unsure about their host's memory handling, recommend entering a fresh BasisTheory token for each purchase rather than saving.
 
 After first successful purchase, **only with explicit user permission**:
 - Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
