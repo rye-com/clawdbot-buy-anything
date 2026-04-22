@@ -60,7 +60,7 @@ Then retry the purchase with the same saved token.
 
 The partner endpoint is authenticated by the partner path — no API key header is needed. Only requests to `/partners/clawdbot/` are accepted.
 
-Stream the request body to `curl` over stdin using a quoted heredoc. The single-quoted delimiter stops the shell from expanding anything inside the body, so user-supplied values (product URL, names, address, token) pass through verbatim. Use this pattern exactly — no files are created, nothing is interpolated into the command:
+Stream the request body to `curl` over stdin using a quoted heredoc. Before running the command, rewrite the JSON body with the real user values for this purchase. The single-quoted delimiter stops the shell from expanding anything inside the body, so the final JSON you place between the heredoc markers is sent verbatim. Do not leave the example values in place, and do not use shell interpolation, environment variables, `jq`, `sed`, or string concatenation to inject user data into the command. Use this transport pattern exactly — no files are created and nothing inside the command is expanded by the shell:
 
 ```bash
 curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
@@ -153,7 +153,7 @@ You: Max set to $500. Open this secure card entry page in your browser:
 User: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
 You: Got it! Submitting your order...
-     [POST to purchase API with the BT token, gets back ci_abc123]
+     [Build the JSON body with the real product URL, buyer fields, token, and maxTotalPrice, then POST it to the purchase API and get back ci_abc123]
 
 You: Order submitted! Waiting for confirmation...
      [Polls GET /purchase/ci_abc123 every 5 seconds]
