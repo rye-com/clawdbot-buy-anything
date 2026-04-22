@@ -1,6 +1,6 @@
 # buy-anything
 
-A Clawdbot skill for purchasing products from Amazon and Shopify stores. Like having a personal shopper in your chat app.
+A Clawdbot skill that helps the user complete purchases from supported Amazon and Shopify stores after explicit confirmation.
 
 ## Installation
 
@@ -33,7 +33,7 @@ cp -r . ./skills/buy-anything
 
 ## Usage
 
-Just ask Clawdbot to buy something from Amazon or any Shopify store:
+Ask Clawdbot to buy something from Amazon or any supported Shopify store:
 
 ```
 You: Buy this for me https://amazon.com/dp/B0DJLKV4N9
@@ -46,10 +46,10 @@ Clawdbot: Got it! What's your max purchase price? (I'll warn you before exceedin
 
 You: $500
 
-Clawdbot: I'm opening a secure card entry page in your browser.
+Clawdbot: Open this secure card entry page in your browser:
+          https://mcp.rye.com/bt-card-capture
           Enter your card details there — they never touch this chat.
           After submitting, copy the token and paste it here.
-          [Opens browser to card capture page]
 
 You: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
@@ -60,24 +60,25 @@ Clawdbot: Order placed!
           Want me to save your card token for next time?
 ```
 
-After saving, future purchases are one message:
+After saving, future purchases are one message, but Clawdbot should still confirm before ordering:
 
 ```
 You: Buy this https://cool-store.com/products/gadget
 
-Clawdbot: Order placed! Total: $29.99
+Clawdbot: I can place that order using your saved shipping info and tokenized card reference.
+          Confirm yes/no.
 ```
 
 ## How Payments Work
 
 ### The short version
 
-When you make your first purchase, Clawdbot opens a secure card entry page in your browser. Your card details go directly to [BasisTheory](https://basistheory.com/) — a PCI-certified token vault — and are converted into a reusable token. Your card number never appears in chat, never touches Clawdbot, and never reaches Rye's servers. Only the token ID is used for purchases.
+When you make your first purchase, Clawdbot sends you to a secure card entry page in your browser. Your card details go directly to [BasisTheory](https://basistheory.com/) — a PCI-certified token vault — and are converted into a reusable token. Your card number never appears in chat. Only the token ID is used for purchases.
 
 ### Under the hood
 
 ```
-Clawdbot opens card capture page in your browser
+Clawdbot provides card capture page
         |
         v
 You enter card details
@@ -98,7 +99,7 @@ Shopify: card forwarded directly to store
 Amazon: token converted to payment server-side (3% fee)
 ```
 
-1. **Clawdbot opens a secure page** — a hosted web page with BasisTheory's PCI-compliant card elements loads in your browser
+1. **Clawdbot provides a secure page** — a hosted web page with BasisTheory's PCI-compliant card elements loads in your browser
 2. **You enter your card** — card details are captured in BasisTheory's secure iframes and sent directly to their vault. The card never appears in chat or in any Clawdbot process
 3. **BasisTheory returns a token** — a reusable token ID (e.g. `d1ff0c32-...`) that represents your card
 4. **You paste the token** — copy the token from the page and paste it into chat. This is an opaque ID, not your card number
@@ -106,7 +107,7 @@ Amazon: token converted to payment server-side (3% fee)
 
 ### Saved cards
 
-When you save your card for future purchases (opt-in only — Clawdbot will ask first), only the **BasisTheory token ID** is stored in Claude Code's local memory on your device — not your card number, expiry, or CVC. This data is never synced to the cloud, shared across devices, or accessible to other skills or agents. The token can only be used through Rye's API and cannot be reverse-engineered back to your card details. Future purchases reuse this token directly with no card entry needed. Clawdbot will always ask for confirmation before placing any order with a saved token.
+When you save your card for future purchases (opt-in only — Clawdbot will ask first), only the **BasisTheory token ID** is stored in local memory on your device — not your card number, expiry, or CVC. The token is a reusable payment reference, not the raw card number. Future purchases can reuse this token directly with no full card entry needed, although CVC may need to be refreshed later. Clawdbot should always ask for confirmation before placing any order with a saved token.
 
 To remove your saved card:
 - **Ask Clawdbot to forget your card token** — this deletes it from local memory and prevents future purchases through this skill
@@ -114,6 +115,11 @@ To remove your saved card:
 - You can delete all saved data (card, address, spending limit) at any time by asking Clawdbot to forget it
 
 ## Guardrails
+
+- Clawdbot should only place an order after an explicit yes/no confirmation in the same conversation
+- Clawdbot should restate the item URL, quantity, shipping recipient, and max approved total before purchase
+- Clawdbot should never store raw card details, expiry, or CVC
+- Clawdbot should delete saved data immediately if the user asks
 
 ### Spending limit
 

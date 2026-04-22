@@ -1,51 +1,57 @@
 ---
 name: buy-anything
-description: Purchase products from Amazon and Shopify stores through conversational checkout. Use when user shares a product URL or says "buy", "order", or "purchase" with a store link.
+description: Help the user complete an online purchase from supported stores after explicit confirmation. Use when the user shares a supported product URL and asks to buy it.
 metadata: {"clawdbot":{"emoji":"📦","requires":{"bins":["curl"]}}}
 ---
 
 # Buy Anything
 
-Purchase products from Amazon and Shopify stores through Rye checkout. Like having a personal shopper in your chat app.
+Help the user complete a purchase from supported Amazon and Shopify product pages through Rye checkout.
 
 ## When to Use
 
 Activate this skill when the user:
 - Shares an Amazon product URL (amazon.com/dp/...)
 - Shares a Shopify store product URL (any *.myshopify.com or custom-domain Shopify store)
-- Says "buy", "order", or "purchase" with a product link
+- Explicitly asks you to buy, order, or purchase with a product link
 - Wants to buy something from an online store
 
 ## IMPORTANT: How This Works
 
+- Only continue when the user explicitly wants to place an order
+- Never place an order without a final confirmation in the same conversation
+- Treat shipping details and payment tokens as sensitive
 - DO NOT try to fetch the product URL yourself with web_fetch or read tools
 - The Rye API handles all product lookup - you just pass the URL
 - You don't need to know product details before checkout
-- Simply collect shipping address and set up the card, then call the API
+- Collect shipping details, collect or reuse a tokenized payment method, then call the API
 - The Rye API validates the URL and returns product details — if the URL is unsupported or invalid, the API will return an error
 
 ## Checkout Flow
 
-1. **User provides product URL** - confirm you'll help them buy it
+1. **User provides product URL** - confirm you'll help and explain that checkout only happens after explicit confirmation
 2. **Collect shipping address** (or use saved address from memory)
 3. **Set up card via BasisTheory** (or use saved BT token from memory)
-4. **Submit order to Rye API using bash** (see Step 2)
-5. **Show order confirmation** from API response
-6. **Save BT token/address to memory** for future purchases (ask permission first)
+4. **Ask for final confirmation** with store URL, quantity, and max price
+5. **Submit order to Rye API using bash** (see Step 2)
+6. **Show order confirmation** from API response
+7. **Save BT token/address to memory** for future purchases (ask permission first)
 
 ## Step 1: Secure Card Capture via BasisTheory
 
-If the user does NOT have a saved BasisTheory token in memory, capture their card securely through the browser.
+If the user does NOT have a saved BasisTheory token in memory, ask them to open the secure card capture page in their own browser.
 
-Try to open the card capture page in the user's browser:
+Provide this link first:
+
+`https://mcp.rye.com/bt-card-capture`
+
+Only if the user explicitly asks you to open it for them, try:
 
 ```bash
 open "https://mcp.rye.com/bt-card-capture" 2>/dev/null || xdg-open "https://mcp.rye.com/bt-card-capture" 2>/dev/null
 ```
 
-If the command fails (e.g. unsupported platform), provide the URL as a clickable link instead: https://mcp.rye.com/bt-card-capture
-
-Tell the user: "I've opened a secure card entry page in your browser. Please enter your card details there and click Submit. Your card info never touches this chat — it goes directly to BasisTheory's PCI-compliant vault. After submitting, copy the token shown on the page and paste it back here."
+Tell the user: "Open the secure card entry page, enter your card details there, and click Submit. Your card info never touches this chat. It goes directly to BasisTheory's PCI-compliant vault and returns a token. After submitting, paste the token shown on the page here."
 
 Wait for the user to paste the token (a UUID like `d1ff0c32-...`).
 
@@ -59,13 +65,13 @@ open "https://mcp.rye.com/bt-cvc-refresh?token_id=SAVED_TOKEN_ID" 2>/dev/null ||
 
 If the command fails, provide the URL as a clickable link instead.
 
-Tell the user: "Your saved card's security code has expired. I've opened a page to re-enter just your CVC — no need to re-enter the full card. Close the tab when done and I'll retry."
+Tell the user: "Your saved card's security code has expired. Re-enter just your CVC on that page, then tell me when it's done. I won't retry until you confirm."
 
 Then retry the purchase with the same saved token.
 
 ## Step 2: Submit Order to Rye
 
-The partner endpoint is authenticated by the partner path — no API key header is needed. Only requests to `/partners/clawdbot/` are accepted.
+Use the Rye partner purchase endpoint for this skill. This endpoint is restricted to the partner-specific route for `clawdbot`; do not invent alternate endpoints or auth flows.
 
 ```bash
 curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
@@ -95,6 +101,15 @@ curl -s -X POST https://api.rye.com/api/v1/partners/clawdbot/purchase \
 ```
 
 **`constraints.maxTotalPrice`**: The user's spending limit in cents (e.g. $500 = 50000). The API will reject the order if the total exceeds this. If the user said "no limit", omit the `constraints` field entirely.
+
+Before calling the API, restate:
+- product URL
+- quantity
+- shipping recipient
+- maximum approved total
+- whether you are using a newly pasted token or a previously saved token
+
+Then ask for a final yes/no confirmation. Only proceed on a clear yes.
 
 The POST response contains an `id` field (e.g. `ci_abc123`). Use this to poll for the order status.
 
@@ -148,10 +163,10 @@ You: Got it! What's your maximum purchase price? (I'll warn you if an order exce
 
 User: $500
 
-You: Max set to $500. I'm opening a secure card entry page in your browser now.
-     Please enter your card details there — your card info never touches this chat.
+You: Max set to $500. Open this secure card entry page:
+     https://mcp.rye.com/bt-card-capture
+     Enter your card details there — your card info never touches this chat.
      After submitting, copy the token shown on the page and paste it here.
-     [Opens https://mcp.rye.com/bt-card-capture]
 
 User: d1ff0c32-a1b2-4c3d-8e4f-567890abcdef
 
@@ -177,14 +192,19 @@ Before the first purchase, ask the user what their maximum purchase price is. St
 
 ## Memory
 
-Saved data is stored in Claude Code's local memory on the user's device only — it is never synced to the cloud, shared across devices, or accessible to other skills or agents.
+Saved data is stored in Clawdbot's local memory on the user's device only. Do not claim broader guarantees than the host product actually provides.
 
 After first successful purchase, **only with explicit user permission**:
-- Save the BasisTheory token ID to memory for future purchases (NOT raw card details — the token is an opaque ID that cannot be reversed into card numbers)
+- Save the BasisTheory token ID to memory for future purchases. Never store raw card details, expiry, or CVC in memory
 - Save shipping address to memory
 - Save maximum purchase price to memory
 - On subsequent purchases, reuse the saved BT token directly — no card entry needed
 - Always confirm with the user before placing an order with a saved token — never place a purchase autonomously
+
+When describing a saved token, say:
+- it is a reusable tokenized payment reference issued by BasisTheory
+- it is not the raw card number
+- CVC may need to be refreshed later
 
 ### Token revocation
 
